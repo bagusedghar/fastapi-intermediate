@@ -44,7 +44,8 @@ Folder 05 memakai FastAPI:
 
 ```bash
 cd 05-service-layer
-uvicorn before:app --reload     # atau after:app
+uvicorn before:app --reload
+uvicorn after:app --reload
 ```
 
 ## Hands-on: Refactor Order API
@@ -81,7 +82,7 @@ pytest -v
 
 Channel notifikasi bisa diganti lewat environment variable `NOTIFICATION_CHANNEL=sms`.
 
-## Catatan untuk Instruktur
+## Catatan
 
-- Contoh sengaja dibuat kecil dan memakai `sqlite3` bawaan Python supaya fokus ke pattern, bukan ke ORM.
+- Contoh sengaja dibuat sederhana dan memakai `sqlite3` bawaan Python supaya fokus ke pattern, bukan ke ORM.
 - `get_order_service()` di `after/main.py` adalah titik masuk ke materi Dependency Injection di Sesi 2.
