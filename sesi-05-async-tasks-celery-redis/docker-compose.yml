@@ -1,0 +1,7 @@
+# Redis untuk broker dan result backend Celery.
+# Jalankan: docker compose up -d
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
