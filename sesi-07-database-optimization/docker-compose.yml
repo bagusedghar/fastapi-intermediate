@@ -1,0 +1,18 @@
+# PostgreSQL untuk aplikasi dan contoh, Redis untuk cache, rate limiter, dan broker Celery.
+# Jalankan: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: orders                      # database aplikasi (hands-on)
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-init:/docker-entrypoint-initdb.d   # membuat database demo (contoh 01-06)
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
