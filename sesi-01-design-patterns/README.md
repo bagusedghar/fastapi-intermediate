@@ -50,7 +50,7 @@ uvicorn after:app --reload
 
 ## Hands-on: Refactor Order API
 
-Mulai dari `06-refactor-order-api/before/main.py`, lalu pecah ke beberapa file seperti di `after/`.
+Mulai dari `06-refactor-order-api/before/main.py`, lalu pecah ke beberapa file di folder kerja baru `latihan/` (di sebelah `before/`). Langkah demi langkahnya ada di slide hands-on, dikerjakan bersama mentor.
 
 ```bash
 cd 06-refactor-order-api/before

@@ -19,7 +19,8 @@ def test_create_order_pakai_fake_repository():
     app.dependency_overrides[get_repository] = lambda: fake
     client = TestClient(app)
 
-    response = client.post("/orders", json={"customer": "budi@mail.com", "subtotal": 200_000})
+    payload = {"customer": "budi@mail.com", "subtotal": 200_000}
+    response = client.post("/orders", json=payload)
 
     assert response.status_code == 201
     assert response.json()["total"] == 190_000

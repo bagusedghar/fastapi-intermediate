@@ -10,10 +10,16 @@ import sqlite3
 class SqliteOrderRepository:
     def __init__(self):
         self.conn = sqlite3.connect("orders.db")
-        self.conn.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, customer TEXT, total INTEGER)")
+        self.conn.execute(
+            "CREATE TABLE IF NOT EXISTS orders "
+            "(id INTEGER PRIMARY KEY, customer TEXT, total INTEGER)"
+        )
 
     def add(self, customer: str, total: int) -> int:
-        cur = self.conn.execute("INSERT INTO orders (customer, total) VALUES (?, ?)", (customer, total))
+        cur = self.conn.execute(
+            "INSERT INTO orders (customer, total) VALUES (?, ?)",
+            (customer, total),
+        )
         self.conn.commit()
         return cur.lastrowid
 

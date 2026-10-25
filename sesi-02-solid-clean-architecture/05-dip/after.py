@@ -31,10 +31,16 @@ class OrderService:
 class SqliteOrderRepository:
     def __init__(self, path: str = "orders.db"):
         self.conn = sqlite3.connect(path)
-        self.conn.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, customer TEXT, total INTEGER)")
+        self.conn.execute(
+            "CREATE TABLE IF NOT EXISTS orders "
+            "(id INTEGER PRIMARY KEY, customer TEXT, total INTEGER)"
+        )
 
     def add(self, customer: str, total: int) -> int:
-        cur = self.conn.execute("INSERT INTO orders (customer, total) VALUES (?, ?)", (customer, total))
+        cur = self.conn.execute(
+            "INSERT INTO orders (customer, total) VALUES (?, ?)",
+            (customer, total),
+        )
         self.conn.commit()
         return cur.lastrowid
 
@@ -63,8 +69,10 @@ class FakeNotifier:
 
 
 if __name__ == "__main__":
-    OrderService(SqliteOrderRepository(), EmailNotifier()).place_order("budi@mail.com", 150_000)
+    app_service = OrderService(SqliteOrderRepository(), EmailNotifier())
+    app_service.place_order("budi@mail.com", 150_000)
 
     notifier = FakeNotifier()
-    OrderService(InMemoryOrderRepository(), notifier).place_order("budi@mail.com", 150_000)
+    test_service = OrderService(InMemoryOrderRepository(), notifier)
+    test_service.place_order("budi@mail.com", 150_000)
     print("fake notifier menerima:", notifier.sent)

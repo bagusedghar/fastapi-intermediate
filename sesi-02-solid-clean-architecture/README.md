@@ -21,6 +21,7 @@ Setiap topik punya dua file: `before.py` (masalahnya) dan `after.py` (setelah pr
 | [`05-dip`](05-dip) | Dependency Inversion | Repository dan notifier dikirim lewat constructor |
 | [`06-dependency-injection`](06-dependency-injection) | DI di FastAPI | `Depends` + `dependency_overrides` di test |
 | [`07-clean-architecture`](07-clean-architecture) | Hands-on | `before/` (hasil Sesi 1) → `after/` (domain, application, infrastructure, api) |
+| [`08-studi-kasus-ongkir`](08-studi-kasus-ongkir) | Studi Kasus | Tugas mandiri hari 1: tambah ongkos kirim per kurir. Soal di README folder itu |
 | `slides/` | | Materi presentasi |
 
 ## Persiapan
@@ -52,7 +53,7 @@ pytest -v                       # test API tanpa menyentuh orders.db
 
 ## Hands-on: Redesign Struktur Project
 
-Mulai dari `07-clean-architecture/before/` (hasil akhir Sesi 1), lalu susun ulang per layer seperti di `after/`.
+Mulai dari `07-clean-architecture/before/` (hasil akhir Sesi 1), lalu susun ulang per layer di folder kerja baru `latihan/`. Langkah demi langkahnya ada di slide hands-on, dikerjakan bersama mentor.
 
 ```
 after/
@@ -77,6 +78,16 @@ Kunci jawaban ada di `after/`:
 
 ```bash
 cd 07-clean-architecture/after
+uvicorn app.main:app --reload
+pytest -v
+```
+
+## Studi Kasus: Tambah Ongkos Kirim
+
+Tugas mandiri di akhir hari pertama, menggabungkan materi Sesi 1 dan Sesi 2. Soal, requirement, dan contoh hasilnya ada di [`08-studi-kasus-ongkir/README.md`](08-studi-kasus-ongkir/README.md). Mulai dari `before/`, kunci jawaban di `after/`.
+
+```bash
+cd 08-studi-kasus-ongkir/after
 uvicorn app.main:app --reload
 pytest -v
 ```
