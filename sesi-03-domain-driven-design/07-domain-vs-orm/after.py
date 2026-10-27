@@ -7,12 +7,15 @@ Repository yang menerjemahkan bolak-balik antara keduanya.
 Struktur tabel bisa berubah tanpa menyentuh Order, dan Order bisa dites tanpa database.
 """
 from sqlalchemy import String, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy.orm import (
+    DeclarativeBase, Mapped, Session, mapped_column,
+)
 
 
 # ---------- domain: tidak import SQLAlchemy ----------
 class Order:
-    def __init__(self, customer: str, total: int, status: str = "pending", id: int | None = None):
+    def __init__(self, customer: str, total: int,
+                 status: str = "pending", id: int | None = None):
         self.id = id
         self.customer = customer
         self.total = total
@@ -20,7 +23,9 @@ class Order:
 
     def pay(self) -> None:
         if self.status != "pending":
-            raise ValueError("Hanya order pending yang bisa dibayar")
+            raise ValueError(
+                "Hanya order pending yang bisa dibayar"
+            )
         self.status = "paid"
 
 
@@ -43,7 +48,11 @@ class SqlAlchemyOrderRepository:
         self.session = session
 
     def add(self, order: Order) -> Order:
-        record = OrderRecord(customer=order.customer, total=order.total, status=order.status)
+        record = OrderRecord(
+            customer=order.customer,
+            total=order.total,
+            status=order.status,
+        )
         self.session.add(record)
         self.session.commit()
         order.id = record.id
@@ -60,7 +69,9 @@ class SqlAlchemyOrderRepository:
 
     @staticmethod
     def _to_domain(record: OrderRecord) -> Order:
-        return Order(record.customer, record.total, record.status, record.id)
+        return Order(
+            record.customer, record.total, record.status, record.id
+        )
 
 
 if __name__ == "__main__":
@@ -71,7 +82,8 @@ if __name__ == "__main__":
         repo = SqlAlchemyOrderRepository(session)
         order_id = repo.add(Order("budi@mail.com", 200_000)).id
 
-        order = repo.get(order_id)    # dapat domain Order, bukan OrderRecord
-        order.pay()                   # business logic tanpa tahu database
+        # dapat domain Order, bukan OrderRecord
+        order = repo.get(order_id)
+        order.pay()  # business logic tanpa tahu database
         repo.save(order)
         print(repo.get(order_id).status)

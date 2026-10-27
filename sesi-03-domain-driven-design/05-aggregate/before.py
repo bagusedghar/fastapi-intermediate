@@ -25,8 +25,9 @@ class Order:
 if __name__ == "__main__":
     order = Order("budi@mail.com")
     order.lines.append(OrderLine("Keyboard", 500_000, 2))
-    print(order.total)                                       # 0, total lupa dihitung
+    print(order.total)  # 0, total lupa dihitung
 
     order.status = "paid"
-    order.lines.append(OrderLine("Mouse", 100_000, -3))     # qty negatif, setelah dibayar pula
+    # qty negatif, setelah dibayar pula
+    order.lines.append(OrderLine("Mouse", 100_000, -3))
     print(len(order.lines), order.status)

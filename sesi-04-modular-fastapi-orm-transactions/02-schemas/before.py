@@ -24,7 +24,7 @@ class Product(BaseModel):
 @app.post("/products", status_code=201)
 def create_product(product: Product):
     PRODUCTS[product.id] = product.model_dump()
-    return PRODUCTS[product.id]          # cost_price ikut terkirim ke client
+    return PRODUCTS[product.id]  # cost_price ikut terkirim
 
 
 @app.get("/products/{product_id}")

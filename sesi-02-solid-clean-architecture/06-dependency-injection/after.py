@@ -1,7 +1,7 @@
 """Dependency Injection di FastAPI - AFTER
 
 Repository dan service disediakan lewat function dependency.
-Route meminta service dengan Depends(), FastAPI yang merakitnya untuk setiap request.
+Route meminta service dengan Depends(), FastAPI yang menyiapkannya untuk setiap request.
 Di test, get_repository bisa diganti lewat app.dependency_overrides (lihat test_after.py).
 
 Jalankan: uvicorn after:app --reload
@@ -44,7 +44,9 @@ def get_repository() -> SqliteOrderRepository:
     return SqliteOrderRepository("orders.db")
 
 
-def get_order_service(repo=Depends(get_repository)) -> OrderService:
+def get_order_service(
+    repo: SqliteOrderRepository = Depends(get_repository),
+) -> OrderService:
     return OrderService(repo)
 
 

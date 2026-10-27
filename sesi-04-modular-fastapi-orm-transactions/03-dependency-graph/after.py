@@ -12,10 +12,16 @@ from collections.abc import Iterator
 
 from fastapi import Depends, FastAPI
 from sqlalchemy import String, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase, Mapped, Session, mapped_column, sessionmaker,
+)
 from sqlalchemy.pool import StaticPool
 
-engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+engine = create_engine(
+    "sqlite://",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 SessionLocal = sessionmaker(engine)
 
 
@@ -47,16 +53,22 @@ class ProductRepository:
         return list(self.session.query(ProductRecord))
 
 
+def to_dict(r: ProductRecord) -> dict:
+    return {"id": r.id, "name": r.name, "price": r.price}
+
+
 # ---------- dependencies ----------
 def get_session() -> Iterator[Session]:
     session = SessionLocal()
     try:
         yield session
     finally:
-        session.close()                      # selalu jalan, error atau tidak
+        session.close()  # selalu jalan, error atau tidak
 
 
-def get_repository(session: Session = Depends(get_session)) -> ProductRepository:
+def get_repository(
+    session: Session = Depends(get_session),
+) -> ProductRepository:
     return ProductRepository(session)
 
 
@@ -65,11 +77,16 @@ app = FastAPI()
 
 
 @app.post("/products", status_code=201)
-def create_product(name: str, price: int, repo: ProductRepository = Depends(get_repository)):
+def create_product(
+    name: str, price: int,
+    repo: ProductRepository = Depends(get_repository),
+):
     record = repo.add(name, price)
-    return {"id": record.id, "name": record.name, "price": record.price}
+    return to_dict(record)
 
 
 @app.get("/products")
-def list_products(repo: ProductRepository = Depends(get_repository)):
-    return [{"id": r.id, "name": r.name, "price": r.price} for r in repo.list()]
+def list_products(
+    repo: ProductRepository = Depends(get_repository),
+):
+    return [to_dict(r) for r in repo.list()]

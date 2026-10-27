@@ -39,14 +39,18 @@ class Order:
 
     def add_item(self, product: str, price: int, qty: int) -> None:
         if self.status != "pending":
-            raise OrderCannotBeChanged("Item hanya bisa ditambah ke order pending")
+            raise OrderCannotBeChanged(
+                "Item hanya bisa ditambah ke order pending"
+            )
         if qty <= 0:
             raise ValueError("Qty harus lebih dari 0")
         self._lines.append(OrderLine(product, price, qty))
 
     def pay(self) -> None:
         if not self._lines:
-            raise OrderCannotBeChanged("Order kosong tidak bisa dibayar")
+            raise OrderCannotBeChanged(
+                "Order kosong tidak bisa dibayar"
+            )
         self.status = "paid"
 
 

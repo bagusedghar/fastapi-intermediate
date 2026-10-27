@@ -19,7 +19,8 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)          # lanjut ke route
     ms = (time.perf_counter() - start) * 1000
     response.headers["X-Process-Time"] = f"{ms:.1f}ms"
-    print(f"{request.method} {request.url.path} {response.status_code} {ms:.1f}ms")
+    path, status = request.url.path, response.status_code
+    print(f"{request.method} {path} {status} {ms:.1f}ms")
     return response
 
 

@@ -23,6 +23,7 @@ Setiap topik punya dua file: `before.py` (masalahnya) dan `after.py` (setelah ko
 | [`07-transaction`](07-transaction) | Transaction Boundary | Commit per langkah vs satu transaksi dengan `session.begin()` |
 | [`08-unit-of-work`](08-unit-of-work) | Unit of Work | Repository tidak commit sendiri, service yang menentukan lewat `uow.commit()` |
 | [`09-modular-api`](09-modular-api) | Hands-on | `before/` (hasil Sesi 3) → `after/` (SQLAlchemy, Unit of Work, produk + stok, error handler, middleware) |
+| [`10-studi-kasus-voucher`](10-studi-kasus-voucher) | Studi Kasus | Tugas mandiri hari 2: voucher belanja dengan kuota. Soal di README folder itu |
 | `slides/` | | Materi presentasi |
 
 ## Persiapan
@@ -55,7 +56,7 @@ Buka http://127.0.0.1:8000/docs untuk mencoba endpoint-nya. Contoh yang memakai 
 
 ## Hands-on: API Modular dengan Transaksi Multi-step
 
-Mulai dari `09-modular-api/before/` (hasil akhir Sesi 3), lalu kembangkan seperti di `after/`.
+Mulai dari `09-modular-api/before/` (hasil akhir Sesi 3). Salin jadi folder kerja baru `latihan/`, lalu kembangkan langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 
 ```
 after/
@@ -100,6 +101,16 @@ curl -X POST localhost:8000/products -H "Content-Type: application/json" \
 curl -X POST localhost:8000/orders -H "Content-Type: application/json" \
   -d '{"customer": "budi@mail.com", "customer_type": "vip", "items": [{"product_id": 1, "qty": 2}]}'
 curl -X POST localhost:8000/orders/1/cancel     # stok Keyboard kembali ke 5
+```
+
+## Studi Kasus: Voucher Belanja
+
+Tugas mandiri di akhir hari kedua, menggabungkan materi Sesi 3 dan Sesi 4. Soal, requirement, dan contoh hasilnya ada di [`10-studi-kasus-voucher/README.md`](10-studi-kasus-voucher/README.md). Mulai dari `before/`, kunci jawaban di `after/`.
+
+```bash
+cd 10-studi-kasus-voucher/after
+uvicorn app.main:app --reload
+pytest -v
 ```
 
 ## Catatan

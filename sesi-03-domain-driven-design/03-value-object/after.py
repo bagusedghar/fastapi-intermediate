@@ -35,9 +35,9 @@ def apply_discount(subtotal: Money, discount: Money) -> Money:
 
 if __name__ == "__main__":
     subtotal = Money(100_000)
-    print(apply_discount(subtotal, subtotal.percent(10)))   # Money(amount=90000)
-    print(apply_discount(subtotal, Money(10)))              # jelas: potongan Rp10
-    print(Money(100_000) == Money(100_000))                 # True, nilainya sama
+    print(apply_discount(subtotal, subtotal.percent(10)))  # 90000
+    print(apply_discount(subtotal, Money(10)))  # potongan Rp10
+    print(Money(100_000) == Money(100_000))  # True, nilainya sama
 
     try:
         Money(-50_000)

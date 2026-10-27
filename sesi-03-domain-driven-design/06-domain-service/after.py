@@ -23,7 +23,9 @@ class Order:
 
     def apply_discount(self, amount: int) -> None:
         if amount > self.subtotal:
-            raise ValueError("Diskon tidak boleh melebihi subtotal")
+            raise ValueError(
+                "Diskon tidak boleh melebihi subtotal"
+            )
         self.discount = amount
 
     @property
@@ -34,7 +36,9 @@ class Order:
 class DiscountPolicy:
     RATES = {"regular": 0, "member": 5, "vip": 10}
 
-    def discount_for(self, customer: Customer, order: Order, today: date) -> int:
+    def discount_for(
+        self, customer: Customer, order: Order, today: date
+    ) -> int:
         percent = self.RATES[customer.customer_type]
         if today.month == 12:            # promo akhir tahun
             percent += 5
@@ -44,5 +48,7 @@ class DiscountPolicy:
 if __name__ == "__main__":
     budi = Customer("budi@mail.com", "vip")
     order = Order(budi.email, 1_000_000)
-    order.apply_discount(DiscountPolicy().discount_for(budi, order, date(2026, 12, 1)))
+    today = date(2026, 12, 1)
+    discount = DiscountPolicy().discount_for(budi, order, today)
+    order.apply_discount(discount)
     print(order.total)   # 850000

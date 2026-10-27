@@ -16,7 +16,10 @@ app = FastAPI(
     title="Order API",
     version="1.0.0",
     description="API untuk membuat dan melihat order.",
-    openapi_tags=[{"name": "orders", "description": "Membuat dan melihat order"}],
+    openapi_tags=[{
+        "name": "orders",
+        "description": "Membuat dan melihat order",
+    }],
 )
 ORDERS: dict[int, dict] = {}
 
@@ -39,17 +42,23 @@ class ErrorOut(BaseModel):
     detail: str
 
 
-@app.post("/orders", status_code=201, response_model=OrderOut, tags=["orders"],
-          summary="Buat order baru")
+@app.post(
+    "/orders", status_code=201, response_model=OrderOut,
+    tags=["orders"], summary="Buat order baru",
+)
 def create_order(payload: OrderIn):
-    order = {"id": len(ORDERS) + 1, "status": "pending", **payload.model_dump()}
+    data = payload.model_dump()
+    order = {"id": len(ORDERS) + 1, "status": "pending", **data}
     ORDERS[order["id"]] = order
     return order
 
 
-@app.get("/orders/{order_id}", response_model=OrderOut, tags=["orders"],
-         summary="Lihat detail order",
-         responses={404: {"model": ErrorOut, "description": "Order tidak ditemukan"}})
+@app.get(
+    "/orders/{order_id}", response_model=OrderOut,
+    tags=["orders"], summary="Lihat detail order",
+    responses={404: {"model": ErrorOut,
+                     "description": "Order tidak ditemukan"}},
+)
 def get_order(order_id: int):
     if order_id not in ORDERS:
         raise HTTPException(404, "Order tidak ditemukan")

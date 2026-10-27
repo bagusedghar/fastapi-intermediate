@@ -23,7 +23,8 @@ class OrderIn(BaseModel):
 
 @app.post("/orders", status_code=201)
 def create_order(payload: OrderIn):
-    order = {"id": len(ORDERS) + 1, "status": "pending", **payload.model_dump()}
+    data = payload.model_dump()
+    order = {"id": len(ORDERS) + 1, "status": "pending", **data}
     ORDERS[order["id"]] = order
     return order
 

@@ -19,9 +19,9 @@ class Order:
 if __name__ == "__main__":
     order = Order(1, "budi@mail.com", 200_000)
     order.status = "paid"
-    order.status = "cancelled"        # sudah dibayar, tapi tetap bisa dibatalkan
+    order.status = "cancelled"  # padahal sudah dibayar
     print(order.status)
 
     before_paid = Order(1, "budi@mail.com", 200_000)
     after_paid = replace(before_paid, status="paid")
-    print(before_paid == after_paid)  # False, padahal order-nya sama (#1)
+    print(before_paid == after_paid)  # False, padahal order #1

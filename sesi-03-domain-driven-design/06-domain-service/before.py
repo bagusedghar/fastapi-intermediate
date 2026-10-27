@@ -20,7 +20,8 @@ class Order:
         self.subtotal = subtotal
 
     def total(self, today: date) -> int:
-        percent = {"regular": 0, "member": 5, "vip": 10}[self.customer.customer_type]
+        rates = {"regular": 0, "member": 5, "vip": 10}
+        percent = rates[self.customer.customer_type]
         if today.month == 12:            # promo akhir tahun
             percent += 5
         return self.subtotal - self.subtotal * percent // 100

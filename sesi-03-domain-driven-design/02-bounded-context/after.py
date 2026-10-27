@@ -17,7 +17,8 @@ class Customer:
 
 
 def discount_percent(customer: Customer) -> int:
-    return {"regular": 0, "member": 5, "vip": 10}[customer.customer_type]
+    rates = {"regular": 0, "member": 5, "vip": 10}
+    return rates[customer.customer_type]
 
 
 # ===================== Shipping context =====================
@@ -30,16 +31,20 @@ class Recipient:
 
 @dataclass
 class Shipment:
-    order_id: int          # yang dibagi antar context cukup id-nya
+    order_id: int  # yang dibagi antar context cukup id-nya
     recipient: Recipient
     courier: str
 
 
 def shipping_label(shipment: Shipment) -> str:
     r = shipment.recipient
-    return f"Order #{shipment.order_id} | {r.name} | {r.address} | {r.phone}"
+    order = f"Order #{shipment.order_id}"
+    return f"{order} | {r.name} | {r.address} | {r.phone}"
 
 
 if __name__ == "__main__":
     print(discount_percent(Customer("budi@mail.com", "vip")))
-    print(shipping_label(Shipment(1, Recipient("Budi", "Jl. Merdeka 1, Bandung", "0812-1111"), "express")))
+    recipient = Recipient(
+        "Budi", "Jl. Merdeka 1, Bandung", "0812-1111"
+    )
+    print(shipping_label(Shipment(1, recipient, "express")))

@@ -35,7 +35,9 @@ class Order:
 
     def _ensure_pending(self, action: str) -> None:
         if self.status != OrderStatus.PENDING:
-            raise OrderCannotBeChanged(f"Order {self.status.value} tidak bisa {action}")
+            raise OrderCannotBeChanged(
+                f"Order {self.status.value} tidak bisa {action}"
+            )
 
     def __eq__(self, other) -> bool:
         return isinstance(other, Order) and self.id == other.id
@@ -52,4 +54,5 @@ if __name__ == "__main__":
     except OrderCannotBeChanged as e:
         print("Ditolak:", e)
 
-    print(order == Order(1, "budi@mail.com", 200_000))  # True, id-nya sama
+    # True: id-nya sama, walaupun statusnya berbeda
+    print(order == Order(1, "budi@mail.com", 200_000))

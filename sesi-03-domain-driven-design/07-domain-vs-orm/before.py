@@ -7,7 +7,9 @@ tabel database (SQLAlchemy) dan tempat business logic (pay()).
 - nama kolom berubah, class business logic ikut diedit
 """
 from sqlalchemy import String, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy.orm import (
+    DeclarativeBase, Mapped, Session, mapped_column,
+)
 
 
 class Base(DeclarativeBase):
@@ -20,11 +22,14 @@ class OrderModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     customer: Mapped[str] = mapped_column(String(100))
     total: Mapped[int]
-    status: Mapped[str] = mapped_column(String(20), default="pending")
+    status: Mapped[str] = mapped_column(String(20))
 
-    def pay(self) -> None:                  # business logic menempel di tabel
+    # business logic menempel di class tabel
+    def pay(self) -> None:
         if self.status != "pending":
-            raise ValueError("Hanya order pending yang bisa dibayar")
+            raise ValueError(
+                "Hanya order pending yang bisa dibayar"
+            )
         self.status = "paid"
 
 
@@ -33,7 +38,10 @@ if __name__ == "__main__":
     Base.metadata.create_all(engine)
 
     with Session(engine) as session:
-        order = OrderModel(customer="budi@mail.com", total=200_000, status="pending")
+        order = OrderModel(
+            customer="budi@mail.com", total=200_000,
+            status="pending",
+        )
         session.add(order)
         session.commit()
 

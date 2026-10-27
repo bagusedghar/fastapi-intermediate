@@ -46,7 +46,7 @@ Folder 07 memakai SQLAlchemy dengan database SQLite di memory, jadi tidak ada fi
 
 ## Hands-on: Modeling Domain dengan DDD Dasar
 
-Mulai dari `08-ddd-order/before/` (hasil akhir Sesi 2), lalu perkaya domain-nya seperti di `after/`.
+Mulai dari `08-ddd-order/before/` (hasil akhir Sesi 2). Salin jadi folder kerja baru `latihan/`, lalu perkaya domain-nya langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 
 ```
 after/

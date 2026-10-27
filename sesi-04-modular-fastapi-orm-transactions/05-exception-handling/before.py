@@ -48,4 +48,5 @@ def create_order(product_id: int, qty: int):
     except ProductNotFound:
         raise HTTPException(404, "produk tidak ada")
     except OutOfStock:
-        return JSONResponse({"msg": "stok habis", "ok": False}, status_code=400)
+        body = {"msg": "stok habis", "ok": False}
+        return JSONResponse(body, status_code=400)

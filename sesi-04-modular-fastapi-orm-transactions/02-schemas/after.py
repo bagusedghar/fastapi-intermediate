@@ -33,7 +33,7 @@ class ProductOut(BaseModel):
 def create_product(payload: ProductIn):
     product = {"id": len(PRODUCTS) + 1, **payload.model_dump()}
     PRODUCTS[product["id"]] = product
-    return product                       # cost_price disaring oleh response_model
+    return product  # cost_price disaring oleh response_model
 
 
 @app.get("/products/{product_id}", response_model=ProductOut)

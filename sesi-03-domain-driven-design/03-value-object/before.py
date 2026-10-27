@@ -11,5 +11,5 @@ def apply_discount(subtotal: int, discount: int) -> int:
 
 
 if __name__ == "__main__":
-    print(apply_discount(100_000, 10))    # 99990, padahal maksudnya diskon 10%
-    print(apply_discount(-50_000, 0))     # harga negatif lolos begitu saja
+    print(apply_discount(100_000, 10))  # 99990, maksudnya 10%?
+    print(apply_discount(-50_000, 0))  # harga negatif lolos

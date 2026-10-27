@@ -17,7 +17,8 @@ app = FastAPI()
 def list_products():
     start = time.perf_counter()
     result = [{"id": 1, "name": "Keyboard"}]
-    print(f"GET /products 200 {(time.perf_counter() - start) * 1000:.1f}ms")
+    ms = (time.perf_counter() - start) * 1000
+    print(f"GET /products 200 {ms:.1f}ms")
     return result
 
 
@@ -25,7 +26,8 @@ def list_products():
 def list_orders():
     start = time.perf_counter()
     result = [{"id": 1, "customer": "budi@mail.com"}]
-    print(f"GET /orders 200 {(time.perf_counter() - start) * 1000:.1f}ms")
+    ms = (time.perf_counter() - start) * 1000
+    print(f"GET /orders 200 {ms:.1f}ms")
     return result
 
 

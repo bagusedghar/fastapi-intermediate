@@ -1,4 +1,4 @@
-"""API: tempat merakit dependency. Di test, function di sini bisa di-override."""
+"""API: tempat menyiapkan dependency. Di test, function di sini bisa di-override."""
 from functools import lru_cache
 
 from fastapi import Depends

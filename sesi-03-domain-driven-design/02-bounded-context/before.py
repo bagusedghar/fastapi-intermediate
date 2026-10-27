@@ -21,14 +21,19 @@ class Customer:
 
 
 def discount_percent(customer: Customer) -> int:
-    return {"regular": 0, "member": 5, "vip": 10}[customer.customer_type]
+    rates = {"regular": 0, "member": 5, "vip": 10}
+    return rates[customer.customer_type]
 
 
 def shipping_label(customer: Customer) -> str:
-    return f"{customer.name} | {customer.address} | {customer.phone}"
+    c = customer
+    return f"{c.name} | {c.address} | {c.phone}"
 
 
 if __name__ == "__main__":
-    budi = Customer("budi@mail.com", "Budi", "vip", 120, "Jl. Merdeka 1, Bandung", "0812-1111", "express")
+    budi = Customer(
+        "budi@mail.com", "Budi", "vip", 120,
+        "Jl. Merdeka 1, Bandung", "0812-1111", "express",
+    )
     print(discount_percent(budi))
     print(shipping_label(budi))

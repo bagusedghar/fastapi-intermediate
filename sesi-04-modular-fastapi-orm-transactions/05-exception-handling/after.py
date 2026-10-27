@@ -35,13 +35,15 @@ class OutOfStock(AppError):
 
 @app.exception_handler(AppError)
 async def handle_app_error(request: Request, exc: AppError):
-    return JSONResponse(status_code=exc.status_code,
-                        content={"error": {"code": exc.code, "message": exc.message}})
+    body = {"error": {"code": exc.code, "message": exc.message}}
+    return JSONResponse(body, status_code=exc.status_code)
 
 
 def find_product(product_id: int) -> dict:
     if product_id not in PRODUCTS:
-        raise ProductNotFound(f"Product #{product_id} tidak ditemukan")
+        raise ProductNotFound(
+            f"Product #{product_id} tidak ditemukan"
+        )
     return PRODUCTS[product_id]
 
 
@@ -54,6 +56,7 @@ def get_product(product_id: int):
 def create_order(product_id: int, qty: int):
     product = find_product(product_id)
     if qty > product["stock"]:
-        raise OutOfStock(f"Stok {product['name']} tinggal {product['stock']}")
+        name, stock = product["name"], product["stock"]
+        raise OutOfStock(f"Stok {name} tinggal {stock}")
     product["stock"] -= qty
     return {"product_id": product_id, "qty": qty}

@@ -8,10 +8,16 @@ Jalankan: uvicorn before:app --reload
 """
 from fastapi import FastAPI
 from sqlalchemy import String, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase, Mapped, Session, mapped_column, sessionmaker,
+)
 from sqlalchemy.pool import StaticPool
 
-engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+engine = create_engine(
+    "sqlite://",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 SessionLocal = sessionmaker(engine)
 
 
@@ -43,23 +49,27 @@ class ProductRepository:
         return list(self.session.query(ProductRecord))
 
 
+def to_dict(r: ProductRecord) -> dict:
+    return {"id": r.id, "name": r.name, "price": r.price}
+
+
 app = FastAPI()
 
 
 @app.post("/products", status_code=201)
 def create_product(name: str, price: int):
-    session = SessionLocal()                 # dibuat manual...
+    session = SessionLocal()  # dibuat manual...
     repo = ProductRepository(session)
     record = repo.add(name, price)
-    result = {"id": record.id, "name": record.name, "price": record.price}
-    session.close()                          # tidak jalan kalau ada error di atas
+    result = to_dict(record)
+    session.close()  # tidak jalan kalau ada error di atas
     return result
 
 
 @app.get("/products")
 def list_products():
-    session = SessionLocal()                 # ...dan diulang di setiap route
+    session = SessionLocal()  # ...dan diulang di setiap route
     repo = ProductRepository(session)
-    result = [{"id": r.id, "name": r.name, "price": r.price} for r in repo.list()]
+    result = [to_dict(r) for r in repo.list()]
     session.close()
     return result

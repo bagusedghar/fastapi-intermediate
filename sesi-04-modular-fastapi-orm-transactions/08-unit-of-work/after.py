@@ -7,7 +7,9 @@ Unit of Work (UoW) memegang session dan semua repository dalam satu transaksi.
 Service juga tidak perlu tahu soal SQLAlchemy Session, cukup tahu uow.
 """
 from sqlalchemy import String, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase, Mapped, Session, mapped_column, sessionmaker,
+)
 
 
 class Base(DeclarativeBase):
@@ -54,7 +56,7 @@ class UnitOfWork:
         return self
 
     def __exit__(self, *exc) -> None:
-        self.session.rollback()        # tidak berefek kalau sudah commit
+        self.session.rollback()  # tidak berefek setelah commit
         self.session.close()
 
     def commit(self) -> None:
@@ -65,15 +67,19 @@ class OrderService:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
-    def place_order(self, customer: str, items: list[tuple[int, int]]) -> None:
+    def place_order(
+        self, customer: str, items: list[tuple[int, int]]
+    ) -> None:
         with self.uow:
             for product_id, qty in items:
                 product = self.uow.products.get(product_id)
                 if qty > product.stock:
-                    raise ValueError(f"Stok {product.name} tidak cukup")
+                    raise ValueError(
+                        f"Stok {product.name} tidak cukup"
+                    )
                 product.stock -= qty
             self.uow.orders.add(customer)
-            self.uow.commit()                      # satu commit untuk semua langkah
+            self.uow.commit()  # satu commit untuk semua langkah
 
 
 if __name__ == "__main__":
@@ -81,7 +87,10 @@ if __name__ == "__main__":
     Base.metadata.create_all(engine)
     SessionLocal = sessionmaker(engine)
     with SessionLocal() as session:
-        session.add_all([ProductRecord(name="Keyboard", stock=5), ProductRecord(name="Mouse", stock=1)])
+        session.add_all([
+            ProductRecord(name="Keyboard", stock=5),
+            ProductRecord(name="Mouse", stock=1),
+        ])
         session.commit()
 
     service = OrderService(UnitOfWork(SessionLocal))
@@ -91,4 +100,5 @@ if __name__ == "__main__":
         print("Gagal:", e)
 
     with SessionLocal() as session:
-        print("Stok Keyboard:", session.get(ProductRecord, 1).stock)   # 5, tidak berubah
+        keyboard = session.get(ProductRecord, 1)
+        print("Stok Keyboard:", keyboard.stock)  # tetap 5

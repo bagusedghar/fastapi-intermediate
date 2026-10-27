@@ -27,13 +27,17 @@ class OrderCannotBeChanged(Exception):
 
 def pay_order(order: Order) -> None:
     if order.status != OrderStatus.PENDING:
-        raise OrderCannotBeChanged("Hanya order pending yang bisa dibayar")
+        raise OrderCannotBeChanged(
+            "Hanya order pending yang bisa dibayar"
+        )
     order.status = OrderStatus.PAID
 
 
 def cancel_order(order: Order) -> None:
     if order.status != OrderStatus.PENDING:
-        raise OrderCannotBeChanged("Hanya order pending yang bisa dibatalkan")
+        raise OrderCannotBeChanged(
+            "Hanya order pending yang bisa dibatalkan"
+        )
     order.status = OrderStatus.CANCELLED
 
 
