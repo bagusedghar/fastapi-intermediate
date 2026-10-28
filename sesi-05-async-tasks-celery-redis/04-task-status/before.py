@@ -17,12 +17,12 @@ from fastapi import FastAPI
 
 celery_app = Celery("demo", broker="redis://localhost:6379/0")
 app = FastAPI()
-JOBS: dict[str, str] = {}             # memory proses API
+JOBS: dict[str, str] = {}         # memory proses API
 
 
 @celery_app.task
 def generate_sales_report(job_id: str, month: str) -> dict:
-    JOBS[job_id] = "running"          # ini memory proses WORKER, bukan API
+    JOBS[job_id] = "running"     # memory proses WORKER, bukan API
     time.sleep(10)
     JOBS[job_id] = "done"
     return {"month": month, "orders": 120, "revenue": 54_000_000}
@@ -38,4 +38,4 @@ def create_sales_report(month: str):
 
 @app.get("/reports/{job_id}")
 def get_report(job_id: str):
-    return {"job_id": job_id, "status": JOBS.get(job_id)}     # selalu "pending"
+    return {"job_id": job_id, "status": JOBS.get(job_id)}  # pending

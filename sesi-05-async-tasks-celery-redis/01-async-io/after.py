@@ -23,21 +23,27 @@ app = FastAPI()
 
 
 async def fetch_shipping_cost(city: str) -> int:
-    await asyncio.sleep(1)            # di aplikasi nyata: await client.get("https://api-ekspedisi/...")
+    await asyncio.sleep(1)        # anggap: memanggil API ekspedisi
     return 20_000
 
 
 @app.get("/shipping/{city}")
 async def shipping_cost(city: str):
-    return {"city": city, "cost": await fetch_shipping_cost(city)}
+    cost = await fetch_shipping_cost(city)
+    return {"city": city, "cost": cost}
 
 
 async def demo():
     transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport,
+                                 base_url="http://test") as client:
+        cities = ["jakarta", "bandung", "surabaya"]
         start = time.perf_counter()
-        await asyncio.gather(*(client.get(f"/shipping/{city}") for city in ["jakarta", "bandung", "surabaya"]))
-        print(f"3 request selesai dalam {time.perf_counter() - start:.1f} detik")   # ~1.0
+        await asyncio.gather(
+            *(client.get(f"/shipping/{city}") for city in cities)
+        )
+        took = time.perf_counter() - start
+        print(f"3 request selesai dalam {took:.1f} detik")  # ~1.0
 
 
 if __name__ == "__main__":

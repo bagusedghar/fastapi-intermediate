@@ -15,7 +15,8 @@ import redis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 app = FastAPI()
 
 PRODUCTS = [
@@ -25,14 +26,14 @@ PRODUCTS = [
 ]
 
 
-def query_products(category: str | None, page: int, size: int = 2) -> list[dict]:
+def query_products(category: str | None, page: int) -> list[dict]:
     rows = [p for p in PRODUCTS if category in (None, p["category"])]
-    return rows[(page - 1) * size: page * size]
+    return rows[(page - 1) * 2: page * 2]        # 2 produk per page
 
 
 @app.get("/products")
 def list_products(category: str | None = None, page: int = 1):
-    cached = cache.get("products")                  # key sama untuk semua query
+    cached = cache.get("products")      # key sama untuk semua query
     if cached is not None:
         return json.loads(cached)
     result = query_products(category, page)
@@ -43,5 +44,7 @@ def list_products(category: str | None = None, page: int = 1):
 if __name__ == "__main__":
     cache.delete("products")
     client = TestClient(app)
-    print("keyboard:", [p["name"] for p in client.get("/products?category=keyboard").json()])
-    print("mouse   :", [p["name"] for p in client.get("/products?category=mouse").json()])   # salah
+    for url in ["/products?category=keyboard",
+                "/products?category=mouse"]:
+        names = [p["name"] for p in client.get(url).json()]
+        print(f"{url:28}", names)       # mouse dapat keyboard

@@ -17,10 +17,11 @@ import redis
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.testclient import TestClient
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 app = FastAPI()
 
-LIMIT, WINDOW = 10, 60                              # 10 request per 60 detik
+LIMIT, WINDOW = 10, 60            # 10 request per 60 detik
 
 
 def rate_limit(request: Request) -> None:
@@ -30,11 +31,13 @@ def rate_limit(request: Request) -> None:
     if count == 1:
         cache.expire(key, WINDOW)
     if count > LIMIT:
+        retry_after = str(WINDOW - now % WINDOW)
         raise HTTPException(429, "Terlalu banyak request",
-                            headers={"Retry-After": str(WINDOW - now % WINDOW)})
+                            headers={"Retry-After": retry_after})
 
 
-@app.post("/orders", status_code=201, dependencies=[Depends(rate_limit)])
+@app.post("/orders", status_code=201,
+          dependencies=[Depends(rate_limit)])
 def create_order():
     return {"message": "Order dibuat"}
 
@@ -44,4 +47,4 @@ if __name__ == "__main__":
         cache.delete(key)
     client = TestClient(app)
     codes = [client.post("/orders").status_code for _ in range(15)]
-    print("Status code:", codes)                    # 10x 201, lalu 5x 429
+    print("Status code:", codes)        # 10x 201, lalu 5x 429

@@ -14,7 +14,8 @@ import time
 
 import redis
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 PRODUCTS = {1: {"id": 1, "name": "Keyboard", "price": 500_000}}
 db_queries = 0
@@ -30,17 +31,19 @@ def query_product(product_id: int) -> dict:
 def get_product(product_id: int) -> dict:
     key = f"product:{product_id}"
     cached = cache.get(key)
-    if cached is not None:                          # cache hit
+    if cached is not None:                  # cache hit
         return json.loads(cached)
 
-    product = query_product(product_id)             # cache miss: ambil dari database
-    cache.set(key, json.dumps(product), ex=60)      # simpan 60 detik (TTL)
+    product = query_product(product_id)     # cache miss
+    cache.set(key, json.dumps(product), ex=60)    # TTL 60 detik
     return product
 
 
 if __name__ == "__main__":
-    cache.delete("product:1")                       # mulai dari cache kosong
+    cache.delete("product:1")               # mulai dari cache kosong
     start = time.perf_counter()
     for _ in range(5):
         get_product(1)
-    print(f"5 request: {time.perf_counter() - start:.1f} detik, query ke database: {db_queries}")   # 0.5 detik, 1
+    took = time.perf_counter() - start
+    print(f"5 request: {took:.1f} detik, "
+          f"query ke database: {db_queries}")    # 0.5 detik, 1

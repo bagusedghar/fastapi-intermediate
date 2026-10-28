@@ -2,7 +2,7 @@
 
 get_session_factory -> get_uow -> get_order_service / get_product_service -> route
 get_session_factory ada di infrastructure, karena dipakai juga oleh worker Celery.
-Notifier sekarang QueuedNotifier: notifikasi dikirim lewat antrean, bukan di dalam request.
+Notifier sekarang QueuedNotifier: notifikasi dikirim lewat queue, bukan di dalam request.
 """
 from fastapi import Depends
 from sqlalchemy.orm import sessionmaker

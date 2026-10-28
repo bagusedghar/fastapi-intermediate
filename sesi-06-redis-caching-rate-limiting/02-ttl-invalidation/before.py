@@ -12,7 +12,8 @@ import os
 
 import redis
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 PRODUCTS = {1: {"id": 1, "name": "Keyboard", "price": 500_000}}
 
@@ -23,12 +24,12 @@ def get_product(product_id: int) -> dict:
     if cached is not None:
         return json.loads(cached)
     product = dict(PRODUCTS[product_id])
-    cache.set(key, json.dumps(product))             # tanpa TTL
+    cache.set(key, json.dumps(product))         # tanpa TTL
     return product
 
 
 def update_price(product_id: int, price: int) -> None:
-    PRODUCTS[product_id]["price"] = price           # cache tidak ikut diubah
+    PRODUCTS[product_id]["price"] = price       # cache tidak diubah
 
 
 if __name__ == "__main__":

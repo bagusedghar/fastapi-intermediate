@@ -16,13 +16,14 @@ ORDERS: dict[int, dict] = {}
 
 
 def send_email(to: str, message: str) -> None:
-    time.sleep(3)                     # anggap: kirim lewat SMTP, butuh 3 detik
+    time.sleep(3)                 # anggap: kirim lewat SMTP
     print(f"[EMAIL] ke {to}: {message}")
 
 
 @app.post("/orders", status_code=201)
 def create_order(customer: str, total: int):
-    order = {"id": len(ORDERS) + 1, "customer": customer, "total": total}
-    ORDERS[order["id"]] = order
-    send_email(customer, f"Order #{order['id']} berhasil")     # client ikut menunggu 3 detik
-    return order
+    order_id = len(ORDERS) + 1
+    order = {"id": order_id, "customer": customer, "total": total}
+    ORDERS[order_id] = order
+    send_email(customer, f"Order #{order_id} berhasil")
+    return order                  # client ikut menunggu 3 detik

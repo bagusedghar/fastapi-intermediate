@@ -13,7 +13,8 @@ import os
 
 import redis
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 LIMIT, WINDOW = 10, 60
 
@@ -29,6 +30,6 @@ def allow(client_id: str, now: float) -> bool:
 if __name__ == "__main__":
     for key in cache.scan_iter("fixed:budi:*"):
         cache.delete(key)
-    accepted = sum(allow("budi", now=59.0) for _ in range(10))      # detik ke-59
-    accepted += sum(allow("budi", now=60.5) for _ in range(10))     # detik ke-60, window baru
-    print(f"Request diterima dalam 2 detik: {accepted} (limit 10 per menit)")   # 20
+    accepted = sum(allow("budi", now=59.0) for _ in range(10))
+    accepted += sum(allow("budi", now=60.5) for _ in range(10))
+    print(f"Diterima dalam 2 detik: {accepted} (limit 10/menit)")  # 20

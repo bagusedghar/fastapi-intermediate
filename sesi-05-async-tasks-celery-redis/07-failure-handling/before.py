@@ -10,7 +10,9 @@ Jalankan demo: python before.py
 """
 from celery import Celery
 
-celery_app = Celery("demo", broker="redis://localhost:6379/0", backend="redis://localhost:6379/1")
+celery_app = Celery("demo",
+                    broker="redis://localhost:6379/0",
+                    backend="redis://localhost:6379/1")
 
 
 class EmailServiceDown(Exception):
@@ -26,10 +28,11 @@ def send_order_email(to: str, message: str) -> None:
     try:
         send_email(to, message)
     except Exception as e:
-        print("error:", e)            # error ditelan di sini
+        print("error:", e)        # error hanya di-print
 
 
 if __name__ == "__main__":
     celery_app.conf.task_always_eager = True
-    result = send_order_email.delay("budi@mail.com", "Order #1 berhasil")
+    result = send_order_email.delay("budi@mail.com",
+                                    "Order #1 berhasil")
     print("Status:", result.state)    # SUCCESS, padahal gagal

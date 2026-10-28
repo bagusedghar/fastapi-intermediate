@@ -19,7 +19,8 @@ import redis
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 app = FastAPI()
 
 PRODUCTS = [
@@ -29,9 +30,9 @@ PRODUCTS = [
 ]
 
 
-def query_products(category: str | None, page: int, size: int = 2) -> list[dict]:
+def query_products(category: str | None, page: int) -> list[dict]:
     rows = [p for p in PRODUCTS if category in (None, p["category"])]
-    return rows[(page - 1) * size: page * size]
+    return rows[(page - 1) * 2: page * 2]        # 2 produk per page
 
 
 def products_key(category: str | None, page: int) -> str:
@@ -39,7 +40,8 @@ def products_key(category: str | None, page: int) -> str:
 
 
 @app.get("/products")
-def list_products(response: Response, category: str | None = None, page: int = 1):
+def list_products(response: Response,
+                  category: str | None = None, page: int = 1):
     key = products_key(category, page)
     cached = cache.get(key)
     if cached is not None:
@@ -56,6 +58,9 @@ if __name__ == "__main__":
     for key in cache.scan_iter("v1:products:list:*"):
         cache.delete(key)
     client = TestClient(app)
-    for url in ["/products?category=keyboard", "/products?category=mouse", "/products?category=mouse"]:
+    for url in ["/products?category=keyboard",
+                "/products?category=mouse",
+                "/products?category=mouse"]:
         r = client.get(url)
-        print(f"{url:30} {r.headers['X-Cache']:4}", [p["name"] for p in r.json()])
+        names = [p["name"] for p in r.json()]
+        print(f"{url:28} {r.headers['X-Cache']:4}", names)

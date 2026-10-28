@@ -20,4 +20,4 @@ def create_order():
 if __name__ == "__main__":
     client = TestClient(app)
     codes = [client.post("/orders").status_code for _ in range(15)]
-    print("Status code:", codes)                    # 15x 201, semua diterima
+    print("Status code:", codes)        # 15x 201, semua diterima

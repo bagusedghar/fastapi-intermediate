@@ -14,17 +14,18 @@ from uuid import uuid4
 
 import redis
 
-cache = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+cache = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 LIMIT, WINDOW = 10, 60
 
 
 def allow(client_id: str, now: float) -> bool:
     key = f"sliding:{client_id}"
-    cache.zremrangebyscore(key, 0, now - WINDOW)    # buang request yang sudah lewat 60 detik
+    cache.zremrangebyscore(key, 0, now - WINDOW)   # buang yang > 60s
     if cache.zcard(key) >= LIMIT:
         return False
-    cache.zadd(key, {uuid4().hex: now})             # catat request ini
+    cache.zadd(key, {uuid4().hex: now})            # catat request ini
     cache.expire(key, WINDOW)
     return True
 
@@ -33,5 +34,5 @@ if __name__ == "__main__":
     cache.delete("sliding:budi")
     accepted = sum(allow("budi", now=59.0) for _ in range(10))
     accepted += sum(allow("budi", now=60.5) for _ in range(10))
-    print(f"Request diterima dalam 2 detik: {accepted} (limit 10 per menit)")   # 10
-    print("Detik ke-119:", allow("budi", now=119.5))    # True, request detik ke-59 sudah lewat 60 detik
+    print(f"Diterima dalam 2 detik: {accepted} (limit 10/menit)")  # 10
+    print("Detik ke-119:", allow("budi", now=119.5))  # True

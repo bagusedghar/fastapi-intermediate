@@ -21,6 +21,7 @@ Setiap topik punya dua file: `before.py` (masalahnya) dan `after.py` (setelah ko
 | [`05-rate-limiting`](05-rate-limiting) | Rate Limiting | Tanpa batas vs fixed window (`INCR` + `EXPIRE`), 429 + `Retry-After` |
 | [`06-sliding-window`](06-sliding-window) | Sliding Window | Celah fixed window di pergantian menit vs sliding window log (sorted set) |
 | [`07-cache-rate-limit`](07-cache-rate-limit) | Hands-on | `before/` (hasil Sesi 5) → `after/` (cache produk, rate limit, benchmark latency) |
+| [`08-studi-kasus-best-seller`](08-studi-kasus-best-seller) | Studi Kasus | Tugas mandiri hari 3: produk terlaris dengan cache dan rate limit. Soal di README folder itu |
 | `docker-compose.yml` | | Redis untuk cache, rate limiter, dan broker Celery |
 | `slides/` | | Materi presentasi |
 
@@ -53,7 +54,7 @@ uvicorn after:app --reload
 
 ## Hands-on: Redis Cache, Rate Limiter & Perbandingan Latency
 
-Mulai dari `07-cache-rate-limit/before/` (hasil akhir Sesi 5), lalu kembangkan seperti di `after/`.
+Mulai dari `07-cache-rate-limit/before/` (hasil akhir Sesi 5). Salin jadi folder kerja baru `latihan/`, lalu kembangkan langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 
 ```
 after/

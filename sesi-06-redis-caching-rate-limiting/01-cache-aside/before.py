@@ -15,7 +15,7 @@ db_queries = 0
 def query_product(product_id: int) -> dict:
     global db_queries
     db_queries += 1
-    time.sleep(0.5)                   # anggap: query berat
+    time.sleep(0.5)               # anggap: query berat
     return dict(PRODUCTS[product_id])
 
 
@@ -27,4 +27,6 @@ if __name__ == "__main__":
     start = time.perf_counter()
     for _ in range(5):
         get_product(1)
-    print(f"5 request: {time.perf_counter() - start:.1f} detik, query ke database: {db_queries}")   # 2.5 detik, 5
+    took = time.perf_counter() - start
+    print(f"5 request: {took:.1f} detik, "
+          f"query ke database: {db_queries}")    # 2.5 detik, 5

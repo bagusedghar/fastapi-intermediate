@@ -21,12 +21,15 @@ from celery import Celery
 from celery.result import AsyncResult
 from fastapi import FastAPI
 
-celery_app = Celery("demo", broker="redis://localhost:6379/0", backend="redis://localhost:6379/1")
+celery_app = Celery("demo",
+                    broker="redis://localhost:6379/0",
+                    backend="redis://localhost:6379/1")
 celery_app.conf.task_track_started = True
 app = FastAPI()
 
-STATUS = {"PENDING": "pending", "STARTED": "running", "RETRY": "retrying",
-          "SUCCESS": "done", "FAILURE": "failed"}
+STATUS = {"PENDING": "pending", "STARTED": "running",
+          "RETRY": "retrying", "SUCCESS": "done",
+          "FAILURE": "failed"}
 
 
 @celery_app.task

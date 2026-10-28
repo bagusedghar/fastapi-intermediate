@@ -20,7 +20,7 @@ Setiap topik punya dua file: `before.py` (masalahnya) dan `after.py` (setelah ko
 | [`04-task-status`](04-task-status) | Task Status | Status di dict (tidak pernah berubah) vs `AsyncResult` dari result backend |
 | [`05-retry-timeout`](05-retry-timeout) | Retry & Timeout | `autoretry_for`, `retry_backoff`, `max_retries`, `soft_time_limit`, `time_limit` |
 | [`06-idempotency`](06-idempotency) | Idempotency | Retry membuat email terkirim dua kali vs idempotency key |
-| [`07-failure-handling`](07-failure-handling) | Failure Handling | Error ditelan (status SUCCESS) vs `on_failure` dan daftar failed jobs |
+| [`07-failure-handling`](07-failure-handling) | Failure Handling | Error hanya di-print (status SUCCESS) vs `on_failure` dan daftar failed jobs |
 | [`08-async-jobs`](08-async-jobs) | Hands-on | `before/` (hasil Sesi 4) → `after/` (notifikasi & report lewat Celery) |
 | `docker-compose.yml` | | Redis untuk broker dan result backend |
 | `slides/` | | Materi presentasi |
@@ -64,7 +64,7 @@ Lalu buka http://127.0.0.1:8000/docs, panggil `POST /reports/sales`, dan cek `GE
 
 ## Hands-on: Asynchronous Job untuk Email & Report
 
-Mulai dari `08-async-jobs/before/` (hasil akhir Sesi 4), lalu kembangkan seperti di `after/`.
+Mulai dari `08-async-jobs/before/` (hasil akhir Sesi 4). Salin jadi folder kerja baru `latihan/`, lalu kembangkan langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 
 ```
 after/
@@ -75,7 +75,7 @@ after/
 │   ├── worker/
 │   │   ├── celery_app.py  # konfigurasi Celery
 │   │   ├── tasks.py       # send_notification, generate_sales_report
-│   │   ├── notifier.py    # QueuedNotifier: adapter Notifier lewat antrean
+│   │   ├── notifier.py    # QueuedNotifier: adapter Notifier lewat queue
 │   │   └── jobs.py        # mulai job & baca status
 │   ├── api/routers/       # + reports.py
 │   └── main.py

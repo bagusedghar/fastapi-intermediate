@@ -12,7 +12,9 @@ Jalankan demo: python after.py
 """
 from celery import Celery
 
-celery_app = Celery("demo", broker="redis://localhost:6379/0", backend="redis://localhost:6379/1")
+celery_app = Celery("demo",
+                    broker="redis://localhost:6379/0",
+                    backend="redis://localhost:6379/1")
 
 
 class EmailServiceDown(Exception):
@@ -31,7 +33,8 @@ def send_email(to: str, message: str) -> None:
     print(f"  percobaan {attempts}: [EMAIL] ke {to}: {message}")
 
 
-@celery_app.task(autoretry_for=(EmailServiceDown,), retry_backoff=True, max_retries=3,
+@celery_app.task(autoretry_for=(EmailServiceDown,),
+                 retry_backoff=True, max_retries=3,
                  soft_time_limit=10, time_limit=15)
 def send_order_email(to: str, message: str) -> None:
     send_email(to, message)
@@ -39,5 +42,6 @@ def send_order_email(to: str, message: str) -> None:
 
 if __name__ == "__main__":
     celery_app.conf.task_always_eager = True
-    result = send_order_email.delay("budi@mail.com", "Order #1 berhasil")
+    result = send_order_email.delay("budi@mail.com",
+                                    "Order #1 berhasil")
     print("Status:", result.state)    # SUCCESS di percobaan ke-3

@@ -23,8 +23,12 @@ def send_email(to: str, message: str) -> None:
 
 
 @app.post("/orders", status_code=201)
-def create_order(customer: str, total: int, background_tasks: BackgroundTasks):
-    order = {"id": len(ORDERS) + 1, "customer": customer, "total": total}
-    ORDERS[order["id"]] = order
-    background_tasks.add_task(send_email, customer, f"Order #{order['id']} berhasil")
-    return order                                              # langsung dikirim ke client
+def create_order(customer: str, total: int,
+                 background_tasks: BackgroundTasks):
+    order_id = len(ORDERS) + 1
+    order = {"id": order_id, "customer": customer, "total": total}
+    ORDERS[order_id] = order
+    background_tasks.add_task(
+        send_email, customer, f"Order #{order_id} berhasil"
+    )
+    return order                  # langsung dikirim ke client
