@@ -34,12 +34,12 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 docker compose up -d             # PostgreSQL di localhost:5432, Redis di localhost:6379
-python seed_demo.py              # isi database demo, sekali saja
+python seed_demo.py              # isi data dummy, sekali saja
 ```
 
 ## Menjalankan Contoh
 
-Semua contoh butuh PostgreSQL dan data demo, lalu cukup dijalankan dengan Python:
+Semua contoh butuh PostgreSQL dan data dummy, lalu cukup dijalankan dengan Python:
 
 ```bash
 cd 01-explain-analyze
@@ -59,7 +59,7 @@ Contoh hasil (angka di laptop kamu bisa berbeda):
 
 ## Hands-on: Profiling & Optimasi Query PostgreSQL
 
-Mulai dari `07-query-optimization/before/` (hasil akhir Sesi 6), lalu kembangkan seperti di `after/`.
+Mulai dari `07-query-optimization/before/` (hasil akhir Sesi 6). Salin jadi folder kerja baru `latihan/`, lalu kembangkan langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 Di `before/` sudah disiapkan `seed.py` (isi 20.000 order) dan `profile_queries.py` (ukur waktu dan jumlah query), supaya bisa diukur sebelum diubah.
 
 ```

@@ -17,27 +17,30 @@ import os
 
 import pika
 
-RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
+URL = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
 
 BINDINGS = {"email": "order.*",
             "points": "order.paid",
             "analytics": "#"}
+PERSISTENT = pika.BasicProperties(
+    delivery_mode=pika.DeliveryMode.Persistent)
 
 
 def publish(channel, event: dict):
     channel.basic_publish(exchange="orders",
                           routing_key=event["type"],
                           body=json.dumps(event),
-                          properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent))
+                          properties=PERSISTENT)
 
 
 if __name__ == "__main__":
-    with pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL)) as connection:
-        channel = connection.channel()
-        channel.confirm_delivery()                        # publish menunggu konfirmasi dari RabbitMQ
-        channel.exchange_declare("orders", exchange_type="topic", durable=True)
+    with pika.BlockingConnection(pika.URLParameters(URL)) as conn:
+        channel = conn.channel()
+        channel.confirm_delivery()    # tunggu konfirmasi RabbitMQ
+        channel.exchange_declare("orders", exchange_type="topic",
+                                 durable=True)
         for queue, pattern in BINDINGS.items():
-            channel.queue_delete(queue)                   # mulai dari queue kosong
+            channel.queue_delete(queue)        # mulai dari kosong
             channel.queue_declare(queue, durable=True)
             channel.queue_bind(queue, "orders", routing_key=pattern)
 
@@ -45,5 +48,6 @@ if __name__ == "__main__":
         publish(channel, {"type": "order.paid", "order_id": 1})
 
         for queue, pattern in BINDINGS.items():
-            count = channel.queue_declare(queue, passive=True).method.message_count
+            info = channel.queue_declare(queue, passive=True)
+            count = info.method.message_count
             print(f"Queue {queue:<9} ({pattern:<10}): {count} pesan")

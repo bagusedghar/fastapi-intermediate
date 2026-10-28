@@ -14,13 +14,14 @@ Setiap topik punya dua file: `before.py` (masalahnya) dan `after.py` (setelah ko
 
 | Folder | Topik | Yang dibahas |
 |---|---|---|
-| [`01-sync-vs-async`](01-sync-vs-async) | Sync vs Async | Semua layanan dipanggil langsung vs producer-consumer lewat antrean |
+| [`01-sync-vs-async`](01-sync-vs-async) | Sync vs Async | Semua layanan dipanggil langsung vs producer-consumer lewat queue |
 | [`02-exchange-queue`](02-exchange-queue) | Exchange & Queue | Producer kirim langsung ke setiap queue vs topic exchange + binding |
 | [`03-ack`](03-ack) | Acknowledgement | `auto_ack` (pesan hilang saat crash) vs ack manual + `prefetch_count` |
 | [`04-nack-dead-letter`](04-nack-dead-letter) | Nack & Dead Letter Queue | Requeue tanpa henti vs retry dengan jeda + dead letter queue |
-| [`05-idempotent-consumer`](05-idempotent-consumer) | Idempotent Consumer | Pesan dobel = poin dobel vs `event_id` dicatat dalam transaksi yang sama |
+| [`05-idempotent-consumer`](05-idempotent-consumer) | Idempotent Consumer | Pesan datang dua kali = poin ditambah dua kali vs `event_id` dicatat dalam transaksi yang sama |
 | [`06-kafka-basics`](06-kafka-basics) | Kafka | RabbitMQ: event hilang setelah di-ack vs Kafka: topic, partition, consumer group, offset |
 | [`07-event-driven-orders`](07-event-driven-orders) | Hands-on | `before/` (hasil Sesi 7) → `after/` (event order lewat RabbitMQ, consumer notifikasi yang retry-safe) |
+| [`08-studi-kasus-poin`](08-studi-kasus-poin) | Studi Kasus | Tugas mandiri hari 4: poin loyalty dari event `order.paid`. Soal di README folder itu |
 | `docker-compose.yml` | | PostgreSQL, Redis, RabbitMQ, dan Kafka |
 | `slides/` | | Materi presentasi |
 
@@ -58,7 +59,7 @@ Contoh hasil:
 
 ## Hands-on: Publish/Consume Event FastAPI dengan RabbitMQ
 
-Mulai dari `07-event-driven-orders/before/` (hasil akhir Sesi 7), lalu kembangkan seperti di `after/`.
+Mulai dari `07-event-driven-orders/before/` (hasil akhir Sesi 7). Salin jadi folder kerja baru `latihan/`, lalu kembangkan langkah demi langkah bersama mentor sesuai slide hands-on. Hasil akhirnya seperti `after/`.
 
 ```
 after/
@@ -83,8 +84,8 @@ Kriteria selesai:
 - [ ] `OrderService` mengumumkan `order.placed`, `order.paid`, `order.cancelled` setelah commit, lewat port `EventPublisher`
 - [ ] Event dikirim ke exchange `orders` (topic), queue `notifications` di-bind dengan `order.*`
 - [ ] Consumer memakai ack manual dan `prefetch_count=1`
-- [ ] Gangguan sementara di-retry dengan jeda yang makin panjang. Pesan rusak dan pesan yang melewati batas retry masuk `notifications.dlq`
-- [ ] Event yang datang dua kali tidak membuat notifikasi dobel (idempotent lewat `event_id`)
+- [ ] Error sementara di-retry dengan jeda yang makin panjang. Pesan rusak dan pesan yang melewati batas retry masuk `notifications.dlq`
+- [ ] Event yang datang dua kali tidak membuat notifikasi terkirim dua kali (idempotent lewat `event_id`)
 - [ ] `pytest` hijau tanpa RabbitMQ
 
 Kunci jawaban ada di `after/`. Menjalankan aplikasi, masing-masing di terminal sendiri:

@@ -12,7 +12,7 @@ Request selesai = koneksi dikembalikan ke pool, bukan ditutup.
 Batas total koneksi ke database = (pool_size + max_overflow) x jumlah proses aplikasi.
 Pastikan masih di bawah max_connections PostgreSQL (default 100).
 
-Butuh PostgreSQL + data demo: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
+Butuh PostgreSQL + data dummy: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
 Jalankan demo: python after.py
 """
 import os
@@ -21,13 +21,16 @@ from concurrent.futures import ThreadPoolExecutor
 
 from sqlalchemy import create_engine, event, text
 
-DATABASE_URL = os.getenv("DEMO_DATABASE_URL", "postgresql+psycopg://app:app@localhost:5432/demo")
-engine = create_engine(DATABASE_URL,
+DB_URL = os.getenv("DEMO_DATABASE_URL",
+                   "postgresql+psycopg://app:app@localhost:5432/demo")
+engine = create_engine(DB_URL,
                        pool_size=10, max_overflow=5,
                        pool_timeout=30,
                        pool_pre_ping=True,
                        pool_recycle=1800)
 connections_opened = 0
+
+GET_ORDER = text("SELECT * FROM orders WHERE id = :id")
 
 
 @event.listens_for(engine, "connect")
@@ -37,12 +40,14 @@ def count_connection(*args):
 
 
 def get_order(order_id: int):
-    with engine.connect() as conn:                    # pinjam koneksi dari pool
-        return conn.execute(text("SELECT * FROM orders WHERE id = :id"), {"id": order_id}).one()
+    with engine.connect() as conn:          # pinjam dari pool
+        return conn.execute(GET_ORDER, {"id": order_id}).one()
 
 
 if __name__ == "__main__":
     start = time.perf_counter()
-    with ThreadPoolExecutor(max_workers=10) as pool:  # 10 request bersamaan
+    with ThreadPoolExecutor(max_workers=10) as pool:  # 10 bersamaan
         list(pool.map(get_order, range(1, 501)))
-    print(f"500 request: {(time.perf_counter() - start) * 1000:.0f} ms, koneksi dibuka: {connections_opened}")
+    ms = (time.perf_counter() - start) * 1000
+    print(f"500 request: {ms:.0f} ms, "
+          f"koneksi dibuka: {connections_opened}")

@@ -1,8 +1,8 @@
-"""Isi database demo untuk contoh 01-06.
+"""Isi data dummy ke database demo, dipakai contoh 01-06.
 
 200 produk, 200.000 order, dan 400.000 item order. Data dibuat langsung di PostgreSQL
 dengan generate_series, jadi cukup sekitar 15 detik.
-Tabel sengaja dibuat TANPA index selain primary key, supaya masalahnya terlihat.
+Tabel sengaja dibuat TANPA index selain primary key, supaya query lambatnya terlihat.
 
 Butuh PostgreSQL: docker compose up -d
 Jalankan sekali dari folder sesi-07: python seed_demo.py
@@ -12,7 +12,8 @@ import time
 
 from sqlalchemy import create_engine, text
 
-DATABASE_URL = os.getenv("DEMO_DATABASE_URL", "postgresql+psycopg://app:app@localhost:5432/demo")
+DB_URL = os.getenv("DEMO_DATABASE_URL",
+                   "postgresql+psycopg://app:app@localhost:5432/demo")
 
 SCHEMA = """
 DROP TABLE IF EXISTS order_lines, orders, products;
@@ -40,31 +41,38 @@ CREATE TABLE order_lines (
 """
 
 SEED = """
+-- 200 produk, g = 1, 2, ..., 200
 INSERT INTO products (name, price)
 SELECT 'Produk ' || g, 10000 + (g * 7919) % 990000
 FROM generate_series(1, 200) AS g;
 
+-- 200.000 order dari 5.000 customer, 1 order per menit
 INSERT INTO orders (customer, status, created_at)
 SELECT 'customer' || (g % 5000) || '@mail.com',
        (ARRAY['pending', 'paid', 'paid', 'cancelled'])[1 + g % 4],
        timestamp '2026-01-01' + g * interval '1 minute'
 FROM generate_series(1, 200000) AS g;
 
+-- 2 item untuk setiap order (n = 1 dan n = 2)
 INSERT INTO order_lines (order_id, product_id, price, qty)
 SELECT o.id, p.id, p.price, 1 + (o.id + n) % 3
 FROM orders AS o
 CROSS JOIN generate_series(1, 2) AS n
 JOIN products AS p ON p.id = 1 + (o.id * 7 + n) % 200;
 
+-- perbarui statistik tabel untuk execution plan
 ANALYZE;
 """
 
 if __name__ == "__main__":
     start = time.perf_counter()
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(DB_URL)
     with engine.begin() as conn:
         conn.execute(text(SCHEMA))
         conn.execute(text(SEED))
-        counts = {table: conn.execute(text(f"SELECT count(*) FROM {table}")).scalar()
-                  for table in ("products", "orders", "order_lines")}
-    print(counts, f"selesai dalam {time.perf_counter() - start:.1f} detik")
+        counts = {}
+        for table in ("products", "orders", "order_lines"):
+            counts[table] = conn.execute(
+                text(f"SELECT count(*) FROM {table}")).scalar()
+    seconds = time.perf_counter() - start
+    print(counts, f"selesai dalam {seconds:.1f} detik")

@@ -4,7 +4,7 @@ Report penjualan per status order.
 Semua order dan semua item diambil ke Python, lalu dihitung dengan loop.
 600.000 baris dikirim lewat jaringan dan disimpan di memory, padahal hasil akhirnya cuma 3 baris.
 
-Butuh PostgreSQL + data demo: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
+Butuh PostgreSQL + data dummy: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
 Jalankan demo: python before.py
 """
 import os
@@ -13,7 +13,9 @@ from collections import defaultdict
 
 from sqlalchemy import create_engine, text
 
-engine = create_engine(os.getenv("DEMO_DATABASE_URL", "postgresql+psycopg://app:app@localhost:5432/demo"))
+DB_URL = os.getenv("DEMO_DATABASE_URL",
+                   "postgresql+psycopg://app:app@localhost:5432/demo")
+engine = create_engine(DB_URL)
 
 
 def sales_by_status(conn):
@@ -25,7 +27,8 @@ def sales_by_status(conn):
     for o in orders:
         report[o.status]["orders"] += 1
     for line in lines:
-        report[status_of[line.order_id]]["revenue"] += line.price * line.qty
+        status = status_of[line.order_id]
+        report[status]["revenue"] += line.price * line.qty
     return dict(report), len(orders) + len(lines)
 
 
@@ -33,5 +36,6 @@ if __name__ == "__main__":
     with engine.connect() as conn:
         start = time.perf_counter()
         report, rows = sales_by_status(conn)
-        print(f"{rows} baris ke Python, {(time.perf_counter() - start) * 1000:.0f} ms")
+        ms = (time.perf_counter() - start) * 1000
+        print(f"{rows} baris ke Python, {ms:.0f} ms")
         print("paid:", report["paid"])

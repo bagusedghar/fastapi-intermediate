@@ -11,17 +11,19 @@ import time
 
 
 def reserve_stock(order):
-    time.sleep(0.05)                      # harus sync: order hanya sah kalau stoknya ada
+    time.sleep(0.05)      # harus sync: order sah jika stoknya ada
 
 
 def send_email(order):
     time.sleep(0.8)                       # server email lambat
-    print(f"  [email] order #{order['id']} terkirim ke {order['customer']}")
+    print(f"  [email] order #{order['id']} terkirim "
+          f"ke {order['customer']}")
 
 
 def add_points(order):
     time.sleep(0.3)
-    print(f"  [points] +{order['total'] // 10_000} poin untuk {order['customer']}")
+    points = order["total"] // 10_000
+    print(f"  [points] +{points} poin untuk {order['customer']}")
 
 
 def update_analytics(order):
@@ -40,8 +42,10 @@ def place_order(order):
 if __name__ == "__main__":
     start = time.perf_counter()
     try:
-        place_order({"id": 1, "customer": "budi@mail.com", "total": 900_000})
+        place_order({"id": 1, "customer": "budi@mail.com",
+                     "total": 900_000})
         print("Response: 201 Created")
     except ConnectionError as exc:
         print(f"Response: 500 Internal Server Error ({exc})")
-    print(f"Waktu response: {(time.perf_counter() - start) * 1000:.0f} ms")
+    ms = (time.perf_counter() - start) * 1000
+    print(f"Waktu response: {ms:.0f} ms")

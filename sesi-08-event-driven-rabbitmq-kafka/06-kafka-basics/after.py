@@ -24,49 +24,58 @@ from confluent_kafka.admin import AdminClient, NewTopic
 BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 TOPIC = "orders"
 
-EVENTS = [(1, "budi"), (2, "ani"), (3, "budi"), (4, "siti"), (5, "ani"), (6, "budi")]
+EVENTS = [(1, "budi"), (2, "ani"), (3, "budi"),
+          (4, "siti"), (5, "ani"), (6, "budi")]
 
 
 def create_topic():
     admin = AdminClient({"bootstrap.servers": BOOTSTRAP})
-    if TOPIC in admin.list_topics(timeout=10).topics:      # mulai dari topic kosong
+    topics = admin.list_topics(timeout=10).topics
+    if TOPIC in topics:                     # mulai dari topic kosong
         admin.delete_topics([TOPIC])[TOPIC].result()
         while TOPIC in admin.list_topics(timeout=10).topics:
             time.sleep(0.5)
-    admin.create_topics([NewTopic(TOPIC, num_partitions=3)])[TOPIC].result()
+    new = NewTopic(TOPIC, num_partitions=3)
+    admin.create_topics([new])[TOPIC].result()
 
 
 def publish():
+    # partitioner sama dengan client Java
     producer = Producer({"bootstrap.servers": BOOTSTRAP,
-                         "partitioner": "murmur2_random"})     # cara hitung partition sama dengan client Java
+                         "partitioner": "murmur2_random"})
     for order_id, customer in EVENTS:
-        event = {"type": "order.placed", "order_id": order_id, "customer": customer}
+        event = {"type": "order.placed", "order_id": order_id,
+                 "customer": customer}
         # key menentukan partition: customer sama = partition sama
-        producer.produce(TOPIC, key=customer, value=json.dumps(event))
+        producer.produce(TOPIC, key=customer,
+                         value=json.dumps(event))
     producer.flush()
 
 
 def consume(group_id: str) -> dict:
-    consumer = Consumer({"bootstrap.servers": BOOTSTRAP, "group.id": group_id,
+    consumer = Consumer({"bootstrap.servers": BOOTSTRAP,
+                         "group.id": group_id,
                          "auto.offset.reset": "earliest",
                          "enable.auto.commit": False})
     consumer.subscribe([TOPIC])
     received = defaultdict(list)
     idle = 0
-    while idle < 2:                                           # demo: berhenti kalau 2 detik tidak ada event
+    while idle < 2:          # demo: berhenti jika 2 s tanpa event
         msg = consumer.poll(1.0)
         if msg is None:
             idle += 1 if consumer.assignment() else 0
             continue
         event = json.loads(msg.value())
-        received[msg.partition()].append((msg.offset(), f"#{event['order_id']} {event['customer']}"))
-        consumer.commit(msg)         # catat: group ini sudah baca sampai sini
+        order = f"#{event['order_id']} {event['customer']}"
+        received[msg.partition()].append((msg.offset(), order))
+        consumer.commit(msg)   # catat: group ini sudah baca sampai sini
     consumer.close()
     return received
 
 
 def show(label: str, received: dict):
-    print(f"{label}: {sum(len(v) for v in received.values())} event")
+    total = sum(len(rows) for rows in received.values())
+    print(f"{label}: {total} event")
     for partition, rows in sorted(received.items()):
         offsets = ",".join(str(offset) for offset, _ in rows)
         orders = ", ".join(order for _, order in rows)

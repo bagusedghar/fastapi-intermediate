@@ -9,14 +9,16 @@ Cara membaca (dari baris paling dalam ke atas):
 - actual time / rows  : waktu (ms) dan jumlah baris yang benar-benar dihasilkan
 - Execution Time      : total waktu query di database
 
-Butuh PostgreSQL + data demo: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
+Butuh PostgreSQL + data dummy: docker compose up -d, lalu python seed_demo.py (dari folder sesi-07)
 Jalankan demo: python after.py
 """
 import os
 
 from sqlalchemy import create_engine, text
 
-engine = create_engine(os.getenv("DEMO_DATABASE_URL", "postgresql+psycopg://app:app@localhost:5432/demo"))
+DB_URL = os.getenv("DEMO_DATABASE_URL",
+                   "postgresql+psycopg://app:app@localhost:5432/demo")
+engine = create_engine(DB_URL)
 
 HISTORY = """
     SELECT id, status, created_at FROM orders
@@ -27,12 +29,15 @@ HISTORY = """
 
 
 def explain(conn, sql: str, params: dict) -> list[str]:
-    return conn.execute(text("EXPLAIN ANALYZE " + sql), params).scalars().all()
+    plan = conn.execute(text("EXPLAIN ANALYZE " + sql), params)
+    return plan.scalars().all()
 
 
 if __name__ == "__main__":
     with engine.begin() as conn:
-        conn.execute(text("DROP INDEX IF EXISTS ix_orders_customer_created"))   # mulai tanpa index
+        conn.execute(text(               # mulai tanpa index
+            "DROP INDEX IF EXISTS ix_orders_customer_created"))
 
-        for line in explain(conn, HISTORY, {"customer": "customer42@mail.com"}):
+        params = {"customer": "customer42@mail.com"}
+        for line in explain(conn, HISTORY, params):
             print(line)
