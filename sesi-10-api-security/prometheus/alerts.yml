@@ -1,0 +1,42 @@
+# Alert dari SLI yang melewati SLO (lihat contoh 06-sli-alerting).
+# SLO Order API:
+#   availability : >= 99.5% request tidak 5xx
+#   latency      : >= 95% request selesai di bawah 300 ms
+# "for" = kondisinya harus bertahan selama itu dulu, supaya lonjakan sesaat tidak memicu alert.
+groups:
+  - name: order-api-slo
+    rules:
+      - alert: OrderApiAvailabilityBelowSLO
+        expr: |
+          sum(rate(http_requests_total{job="order-api", status!~"5.."}[5m]))
+            / sum(rate(http_requests_total{job="order-api"}[5m])) < 0.995
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "Availability Order API di bawah 99.5%"
+
+      - alert: OrderApiLatencyBelowSLO
+        expr: |
+          sum(rate(http_request_duration_seconds_bucket{job="order-api", le="0.3"}[5m]))
+            / sum(rate(http_request_duration_seconds_count{job="order-api"}[5m])) < 0.95
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "Kurang dari 95% request Order API selesai di bawah 300 ms"
+
+      - alert: NotificationDeadLettered
+        expr: increase(notifications_processed_total{result="dead_lettered"}[10m]) > 0
+        labels:
+          severity: ticket
+        annotations:
+          summary: "Ada notifikasi yang masuk DLQ, perlu dicek manual"
+
+      - alert: OrderApiDown
+        expr: up{job="order-api"} == 0
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: "Prometheus tidak bisa mengambil /metrics dari Order API"

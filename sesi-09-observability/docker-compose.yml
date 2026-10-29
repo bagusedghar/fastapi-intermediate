@@ -1,0 +1,37 @@
+# PostgreSQL, Redis, dan RabbitMQ untuk Order API. Jaeger untuk trace, Prometheus untuk metrics dan alert.
+# Jalankan: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: orders
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    ports:
+      - "5672:5672"                            # AMQP, dipakai aplikasi
+      - "15672:15672"                          # dashboard: http://localhost:15672 (guest / guest)
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    ports:
+      - "4318:4318"                            # menerima trace dari aplikasi (OTLP HTTP)
+      - "16686:16686"                          # UI: http://localhost:16686
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    ports:
+      - "9090:9090"                            # UI: http://localhost:9090
+    volumes:
+      - ./prometheus:/etc/prometheus           # prometheus.yml dan alerts.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    # supaya bisa scrape API yang jalan di laptop (Linux)
