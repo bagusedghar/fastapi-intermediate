@@ -1,0 +1,4 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30
+# versi C (lebih cepat), di-compile saat pip install, jadi butuh gcc dan libpq-dev
+psycopg[c]>=3.2

@@ -1,0 +1,12 @@
+# Service: satu nama DNS tetap (order-api) di depan semua pod berlabel app=order-api.
+# Request dibagi ke pod yang sedang siap. Pod lain di cluster cukup memanggil http://order-api
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-api
+spec:
+  selector:
+    app: order-api
+  ports:
+    - port: 80                  # port Service
+      targetPort: 8000          # port container

@@ -1,0 +1,17 @@
+# Deployment & Service - BEFORE (satu Pod langsung)
+# - Pod dihapus atau node mati = aplikasi hilang, tidak ada yang membuat ulang
+# - Hanya satu salinan, tidak bisa dibagi beban
+# - Client harus tahu IP pod, dan IP itu berubah setiap pod dibuat ulang
+apiVersion: v1
+kind: Pod
+metadata:
+  name: order-api
+  labels:
+    app: order-api
+spec:
+  containers:
+    - name: api
+      image: k8s-demo:1.0
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 8000

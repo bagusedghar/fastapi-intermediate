@@ -1,0 +1,44 @@
+# Probes - AFTER (memakai endpoint health check dari Sesi 9)
+# - readinessProbe: gagal = pod dikeluarkan dari Service (tidak menerima traffic), TANPA restart
+# - livenessProbe : gagal beberapa kali berturut-turut = container di-restart
+# resources: batas CPU dan memori, supaya satu pod tidak menghabiskan resource node
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: api
+          image: k8s-demo:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: STARTUP_SECONDS
+              value: "20"
+            - name: BREAK_AFTER
+              value: "45"
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi

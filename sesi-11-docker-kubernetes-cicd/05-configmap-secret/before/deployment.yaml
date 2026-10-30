@@ -1,0 +1,27 @@
+# ConfigMap & Secret - BEFORE (config dan secret ditulis langsung di Deployment)
+# - API_KEY terbaca oleh siapa pun yang bisa membuka file ini atau repository-nya
+# - Config yang sama untuk banyak Deployment harus ditulis ulang di setiap file
+# - Mengganti config = mengubah manifest Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: api
+          image: k8s-demo:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MESSAGE
+              value: "Halo dari Deployment"
+            - name: API_KEY
+              value: "sk-live-8f2a91c4d7e3"

@@ -1,0 +1,25 @@
+# ConfigMap & Secret - AFTER
+# Deployment hanya menyebut nama ConfigMap dan Secret. Semua key-nya menjadi environment variable.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: api
+          image: k8s-demo:1.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: order-api-config
+            - secretRef:
+                name: order-api-secret

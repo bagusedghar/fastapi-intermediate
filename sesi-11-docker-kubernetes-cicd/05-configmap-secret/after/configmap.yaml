@@ -1,0 +1,8 @@
+# ConfigMap: config yang tidak rahasia, bisa dipakai banyak Deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-api-config
+data:
+  MESSAGE: "Halo dari ConfigMap"
+  LOG_LEVEL: "INFO"

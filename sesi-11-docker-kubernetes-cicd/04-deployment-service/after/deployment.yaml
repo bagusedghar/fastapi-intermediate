@@ -1,0 +1,22 @@
+# Deployment & Service - AFTER
+# Deployment menjaga jumlah pod sesuai replicas. Pod mati atau dihapus = dibuat ulang otomatis.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-api            # pod mana yang diurus Deployment ini
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: api
+          image: k8s-demo:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000

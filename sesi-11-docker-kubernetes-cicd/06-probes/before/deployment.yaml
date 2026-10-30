@@ -1,0 +1,27 @@
+# Probes - BEFORE (Kubernetes hanya melihat proses masih hidup atau tidak)
+# Aplikasi demo butuh 20 detik untuk siap (STARTUP_SECONDS), lalu macet setelah 45 detik (BREAK_AFTER).
+# - Pod langsung dianggap Ready dan menerima traffic, padahal aplikasi belum siap
+# - Setelah macet, proses masih hidup, jadi pod tidak pernah di-restart
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: api
+          image: k8s-demo:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: STARTUP_SECONDS
+              value: "20"
+            - name: BREAK_AFTER
+              value: "45"

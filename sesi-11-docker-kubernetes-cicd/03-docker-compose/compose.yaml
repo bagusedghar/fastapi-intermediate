@@ -1,0 +1,33 @@
+# Docker Compose - AFTER
+# Semua service ditulis di satu file, lalu dijalankan dengan: docker compose up -d --build
+# - Satu network bersama: service saling memanggil dengan nama service (postgres, redis)
+# - depends_on + healthcheck: API baru start setelah PostgreSQL dan Redis siap
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:app@postgres:5432/postgres
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: app
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      retries: 15

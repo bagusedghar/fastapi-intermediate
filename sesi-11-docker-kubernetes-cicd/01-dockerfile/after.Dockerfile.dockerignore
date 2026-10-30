@@ -1,0 +1,9 @@
+# File yang TIDAK dikirim ke docker build (dipakai otomatis untuk after.Dockerfile)
+.env*
+.git
+.venv
+__pycache__
+*.pyc
+tests
+*.Dockerfile
+*.dockerignore

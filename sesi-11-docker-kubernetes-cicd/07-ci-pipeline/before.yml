@@ -1,0 +1,18 @@
+# CI - BEFORE (.github/workflows/ci.yml)
+# - Baru jalan setelah kode masuk main, jadi kode bermasalah sudah terlanjur di-merge
+# - Hanya pytest: tidak ada lint, tidak ada build image, tidak ada scan keamanan
+# - Versi Python tidak ditentukan, hasilnya bisa berbeda dengan production
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - run: pip install -r requirements.txt
+      - run: pytest
